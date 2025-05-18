@@ -61,9 +61,11 @@ header .container {
 
 .logo-img {
   height: 32px;
-  width: 32px;
+  width: auto;
+  max-width: 32px;
   margin-right: 8px;
   border-radius: 4px;
+  object-fit: contain;
 }
 
 .logo a:hover {

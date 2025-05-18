@@ -31,26 +31,18 @@ const reportLCP = () => {
 
 // Optimizador del LCP
 const optimizeLCP = () => {
-  // Función para asegurar que las imágenes LCP se carguen con alta prioridad
-  const lcpImages = document.querySelectorAll('.lcp-image');
-  lcpImages.forEach(img => {
-    // Asegurarse de que la imagen tenga fetchpriority alto
+  // Incluir el logo junto con las imágenes LCP
+  const lcpElements = document.querySelectorAll('.lcp-image, .logo-img');
+  lcpElements.forEach(img => {
     img.setAttribute('fetchpriority', 'high');
     
-    // Si la imagen no está visible o en pantalla, hacerla visible inmediatamente
     if (img.style.opacity === '0' || img.style.visibility === 'hidden') {
       img.style.opacity = '1';
       img.style.visibility = 'visible';
     }
     
-    // Si la imagen usa data-src en lugar de src, moverla a src
     if (!img.src && img.dataset.src) {
       img.src = img.dataset.src;
-    }
-    
-    // Si la imagen usa data-srcset, moverlo a srcset
-    if (!img.srcset && img.dataset.srcset) {
-      img.srcset = img.dataset.srcset;
     }
   });
 };
