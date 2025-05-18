@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMatch - Encuentra tu próxima lectura</title>
+    
+    <!-- Estilos críticos inline para el primer renderizado -->
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-dark: #29436d;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --gray-color: #43494e;
+            --light-gray: #e9ecef;
+            --font-primary: sans-serif;
+        }
+        body {
+            font-family: var(--font-primary);
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo-img {
+            height: 32px;
+            width: 32px;
+            margin-right: 8px;
+            border-radius: 4px;
+        }
+    </style>
+    
+    <!-- CSS no crítico con carga diferida -->
+    <link rel="preload" href="/static/css/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/static/css/styles.css"></noscript>
+    
+    <!-- Precarga de RemixIcon con carga diferida -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"></noscript>
+    
+    <link rel="icon" href="/static/img/logo.webp" type="image/webp">
+    
+    <!-- Script para carga diferida de CSS -->
+    <script>
+        /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+        !function(e){"use strict";var n=function(n,t,o,i){var r,d=e.document,a=d.createElement("link");if(t)r=t;else{var l=(d.body||d.getElementsByTagName("head")[0]).childNodes;r=l[l.length-1]}var f=d.styleSheets;if(i)for(var s in i)i.hasOwnProperty(s)&&a.setAttribute(s,i[s]);a.rel="stylesheet",a.href=n,a.media="only x",function e(n){if(d.body)return n();setTimeout(function(){e(n)})}(function(){r.parentNode.insertBefore(a,t?r:r.nextSibling)});var u=function(e){for(var n=a.href,t=f.length;t--;)if(f[t].href===n)return e();setTimeout(function(){u(e)})};function c(){a.addEventListener&&a.removeEventListener("load",c),a.media=o||"all"}return a.addEventListener&&a.addEventListener("load",c),a.onloadcssdefined=u,u(c),a};"undefined"!=typeof exports?exports.loadCSS=n:e.loadCSS=n}("undefined"!=typeof global?global:this);
+    </script>
+</head>
+<body><header>
+        <div class="container">
+            <div class="logo">
+                <a href="/"><img src="/static/img/logo.webp" alt="BookMatch Logo" class="logo-img">BookMatch</a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/books">Explorar</a></li>
+                    <li><a href="/recommendations">Recomendaciones</a></li>
+                    <li><a href="/about">Acerca de</a></li>
+                </ul>
+            </nav>
+            <div id="auth-section" class="auth-section">
+                <!-- Aquí se insertará dinámicamente el botón de login o el perfil del usuario -->
+                <a href="/login" class="login-btn">Iniciar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Descubre tu próxima lectura favorita</h1>
+                <p>BookMatch te conecta con los libros que amarás basándose en tus gustos y preferencias.</p>
+                <div class="cta-buttons">
+                    <a href="/recommendations" class="btn primary-btn">Obtener recomendaciones</a>
+                    <a href="/books" class="btn secondary-btn">Explorar catálogo</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="/static/img/books-illustration.svg" alt="Ilustración de libros">
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>¿Por qué BookMatch?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Recomendaciones personalizadas</h3>
+                    <p>Algoritmos inteligentes que aprenden de tus preferencias para sugerirte lecturas perfectas para ti.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Descubre nuevos géneros</h3>
+                    <p>Amplía tus horizontes literarios encontrando nuevos autores y géneros que podrían gustarte.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Haz seguimiento de tus lecturas</h3>
+                    <p>Lleva un registro de los libros que has leído, estás leyendo o planeas leer en el futuro.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Lee Citas</h3>
+                    <p>Citas interesantes recien salidas del scrapper!</p>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>BookMatch</h2>
+                    <p>Encuentra tu próxima lectura favorita</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Enlaces rápidos</h3>
+                    <ul>
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="/books">Explorar</a></li>
+                        <li><a href="/recommendations">Recomendaciones</a></li>
+                        <li><a href="/about">Acerca de</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contacto</h3>
+                    <p>¿Tienes preguntas o sugerencias?</p>
+                    <a href="mailto:info@bookmatch.com">info@bookmatch.com</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Un lector vive mil vidas antes de morir. Aquel que nunca lee vive solo una</p>
+            </div>
+        </div>
+    </footer>    <script src="/static/js/dropdown.js"></script>
+    <script src="/static/js/auth-service.js"></script>
+    <script src="/static/js/user-menu.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/slideshow.js"></script>
+    <script src="/static/js/lazy-loading.js"></script>
+    <script src="/static/js/quotes.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

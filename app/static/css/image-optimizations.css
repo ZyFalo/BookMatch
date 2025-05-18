@@ -1,0 +1,94 @@
+/* Optimización de imágenes y contenedores multimedia */
+
+/* Hero Image Container - Tamaños específicos */
+.hero-image {
+  flex: 1;
+  position: relative;
+  height: 350px;
+  width: 450px;
+  max-width: 450px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin: 0 auto;
+}
+
+.hero-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 450px;
+  height: 350px;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.hero-image img.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* Logo con dimensiones precisas */
+.logo-img {
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Imágenes de autor en sección de citas */
+.author-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* Evita que la imagen se comprima */
+}
+
+.author-image img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* Responsive para dispositivos móviles */
+@media (max-width: 768px) {
+  .hero-image {
+    width: 360px;
+    height: 280px;
+    max-width: 360px;
+  }
+
+  .hero-image img {
+    width: 360px;
+    height: 280px;
+  }
+  
+  .author-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .author-image img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-image {
+    width: 300px;
+    height: 230px;
+    max-width: 300px;
+  }
+
+  .hero-image img {
+    width: 300px;
+    height: 230px;
+  }
+}

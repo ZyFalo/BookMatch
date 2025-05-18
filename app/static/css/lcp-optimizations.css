@@ -1,0 +1,55 @@
+/* Optimizaciones para el Largest Contentful Paint (LCP) */
+
+/* Estilos para el elemento LCP (imagen principal del hero) */
+.lcp-image {
+  /* Asegurar que el elemento sea visible inmediatamente */
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 2 !important;
+  
+  /* Prevenir que el navegador redimensione la imagen durante la carga */
+  contain: layout paint;
+  content-visibility: auto;
+  
+  /* Asegurar que se reserva el espacio correcto */
+  display: block;
+  aspect-ratio: 450 / 350;
+}
+
+/* Optimizar el contenedor del LCP */
+.hero-image {
+  /* Evitar trabajo de layout innecesario */
+  contain: layout size;
+  content-visibility: auto;
+  
+  /* Asegurar dimensiones correctas */
+  position: relative;
+  height: 350px;
+  width: 450px;
+  
+  /* Reservar espacio para evitar CLS */
+  min-height: 350px;
+}
+
+/* Asegurar que el hero section sea visible de inmediato */
+.hero {
+  content-visibility: auto;
+  contain-intrinsic-size: 700px;
+}
+
+/* Responsive para dispositivos móviles */
+@media (max-width: 768px) {
+  .lcp-image {
+    aspect-ratio: 300 / 230;
+  }
+  
+  .hero-image {
+    height: 230px;
+    width: 300px;
+    min-height: 230px;
+  }
+  
+  .hero {
+    contain-intrinsic-size: 500px;
+  }
+}

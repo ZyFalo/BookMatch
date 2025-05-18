@@ -1,0 +1,160 @@
+/* Estilos específicos para componentes interactivos */
+
+/* Hero Slideshow Styles */
+#hero-slideshow {
+    position: relative;
+    width: 450px;
+    height: 350px;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+#hero-slideshow img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#hero-slideshow img.active {
+    opacity: 1;
+}
+
+/* Quote Section with Blue Background */
+.quote-section {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    padding: 4rem 0;
+    color: white;
+    margin: 2rem 0;
+}
+
+.quote-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.quote-slider {
+    position: relative;
+    height: 220px;
+}
+
+.quote-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.quote-slide.active {
+    opacity: 1;
+}
+
+.quote-text {
+    font-size: 1.8rem;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+}
+
+.author-container {
+    display: flex;
+    align-items: center;
+}
+
+.author-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.author-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.quote-author {
+    font-size: 1.1rem;
+    text-align: left;
+}
+
+/* Feature Cards with Circular Icons */
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f0f4f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    transition: color 0.3s;
+}
+
+.feature-icon.hover {
+    background-color: var(--primary-color);
+}
+
+.feature-icon.hover i {
+    color: white;
+}
+
+.feature-card:hover .feature-icon {
+    background-color: var(--primary-color);
+}
+
+.feature-card:hover .feature-icon i {
+    color: white;
+}
+
+/* Responsive styles */
+@media (max-width: 900px) {
+    #hero-slideshow {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+    
+    .quote-text {
+        font-size: 1.5rem;
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .feature-icon i {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .quote-slide {
+        height: auto;
+    }
+    
+    .quote-slider {
+        height: 280px;
+    }
+}
