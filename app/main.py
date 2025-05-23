@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.users import router as user_router
 from app.db.mongo import check_connection, startup_db_client
+from app.services.auth import get_current_user
 
 app = FastAPI(title="BookMatch API")
 
@@ -40,19 +41,9 @@ async def read_root(request: Request):
 async def read_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-# Ruta para comprobar el estado de la API
-@app.get("/api/health")
-async def health_check():
-    is_db_connected = await check_connection()
-    return {
-        "status": "ok" if is_db_connected else "error",
-        "database": "connected" if is_db_connected else "disconnected"
-    }
-
-# Ruta para comprobar el estado de la API sin bloquear
-@app.get("/api/quick-health")
-def quick_health_check():
-    return {"status": "running", "message": "API funcionando correctamente"}
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    return templates.TemplateResponse("profile.html", {"request": request})
 
 # Ruta para pruebas de validación de esquemas
 @app.post("/api/debug/validate")

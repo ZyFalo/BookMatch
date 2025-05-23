@@ -61,11 +61,9 @@ header .container {
 
 .logo-img {
   height: 32px;
-  width: auto;
-  max-width: 32px;
+  width: 32px;
   margin-right: 8px;
   border-radius: 4px;
-  object-fit: contain;
 }
 
 .logo a:hover {
@@ -349,17 +347,29 @@ header .container {
   border-radius: 50%;
 }
 
+.logo-img {
+  height: 32px;
+  width: auto; /* Cambia de width fijo a automático */
+  max-width: 32px; /* Limita el ancho máximo */
+  margin-right: 8px;
+  border-radius: 4px;
+  object-fit: contain; /* Asegura que la imagen se muestra completa */
+}
+
 @media (max-width: 768px) {
   .hero-image {
     height: 360px;
-    max-width: 240px; /* Mantener proporción de libro */
+    max-width: 240px;
   }
 }
 
 @media (max-width: 576px) {
   .hero-image {
     height: 320px;
-    max-width: 220px; /* Mantener proporción de libro */
+    max-width: 220px;
+  }
+  .logo-img {
+    height: 28px;
   }
 }
 

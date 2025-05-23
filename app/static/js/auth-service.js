@@ -120,10 +120,20 @@ const AuthService = {
     // Verificar si el usuario está autenticado
     isAuthenticated: function() {
         return !!this.currentUser;
+    },
+    
+    // Proteger páginas que requieren autenticación
+    requireAuthPage: async function() {
+        const user = await this.getCurrentUser();
+        if (!user) {
+            window.location.href = '/login';
+        }
     }
 };
 
 // Inicializar el servicio de autenticación cuando se carga la página
+// Puedes llamar a AuthService.requireAuthPage() en páginas protegidas como /profile
+
 document.addEventListener('DOMContentLoaded', function() {
     AuthService.init();
 });
