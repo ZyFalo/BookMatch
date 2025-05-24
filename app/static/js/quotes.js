@@ -1,27 +1,45 @@
 /**
- * Script para manejar el cambio de frases en la sección quote-section
+ * Script para mostrar una cita aleatoria en la sección quote-section usando JS nativo
  */
-document.addEventListener('DOMContentLoaded', function() {
-    const quoteSlider = document.getElementById('quote-slider');
-    if (!quoteSlider) return;
-    
-    const quotes = quoteSlider.querySelectorAll('.quote-slide');
-    if (quotes.length <= 1) return;
-    
-    let currentQuoteIndex = 0;
-    
-    // Función para cambiar a la siguiente frase
-    function nextQuote() {
-        // Quitar la clase active de la frase actual
-        quotes[currentQuoteIndex].classList.remove('active');
-        
-        // Calcular el índice de la siguiente frase
-        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-        
-        // Añadir la clase active a la nueva frase actual
-        quotes[currentQuoteIndex].classList.add('active');
+async function loadRandomQuote() {
+    try {
+        const response = await fetch('/quotes/random');
+        if (response.ok) {
+            const data = await response.json();
+
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            const img = document.getElementById('quote-author-img');
+
+            // Limpieza: quitar comillas (“” o ") al inicio/final y coma al final del autor
+            if (data.quote && quoteText)
+                quoteText.textContent = data.quote.replace(/^["“”]+|["“”]+$/g, '');
+
+            if (data.author && quoteAuthor)
+                quoteAuthor.textContent = `- ${data.author.replace(/,+$/, '')}`;
+
+            if (img) {
+                img.src = data.image_url || '/static/img/authors/default.webp';
+                img.alt = data.author || 'Autor';
+                img.width = 80;
+                img.height = 80;
+            }
+
+        } else {
+            console.error("Error al obtener la cita:", response.status, response.statusText);
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            if (quoteText) quoteText.textContent = "No se pudo cargar la cita.";
+            if (quoteAuthor) quoteAuthor.textContent = "";
+        }
+    } catch (e) {
+        console.error("Excepción al cargar la cita:", e);
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        if (quoteText) quoteText.textContent = "No se pudo cargar la cita.";
+        if (quoteAuthor) quoteAuthor.textContent = "";
     }
-    
-    // Cambiar la frase cada 8 segundos
-    setInterval(nextQuote, 8000);
-});
+}
+
+// Llama a la función al cargar la página
+document.addEventListener('DOMContentLoaded', loadRandomQuote);

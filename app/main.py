@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.users import router as user_router
+from app.routes.quotes import router as quotes_router 
 from app.db.mongo import check_connection, startup_db_client
 from app.services.auth import get_current_user
 
@@ -31,6 +32,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 # Incluir rutas de la API
 app.include_router(user_router, prefix="/users", tags=["users"])
+app.include_router(quotes_router, prefix="/quotes", tags=["quotes"])
 
 # Rutas principales para servir las páginas HTML
 @app.get("/", response_class=HTMLResponse)

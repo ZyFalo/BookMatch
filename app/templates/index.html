@@ -26,33 +26,15 @@
 </section>
 
 <!-- Sección de frases con fondo azul -->
-<section class="quote-section">
-    <div class="quote-container">
-        <div class="quote-slider" id="quote-slider">
-            <div class="quote-slide active">
-                <p class="quote-text">Un lector vive mil vidas antes de morir. Aquel que nunca lee vive solo una.</p>                <div class="author-container">
-                    <div class="author-image">
-                        <img src="/static/img/authors/george-martin.webp" alt="George R.R. Martin" width="60" height="60">
-                    </div>
-                    <p class="quote-author">- George R.R. Martin<br><small>Autor de "Canción de hielo y fuego"</small></p>
-                </div>
+<section class="quote-section" style="color: #fff; padding: 2.5rem 0; display: flex; align-items: center; justify-content: center;">
+    <div class="quote-container" style="width: 100%; max-width: 800px; margin: 0 auto;">
+        <div class="quote-slide active" id="dynamic-quote" style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+            <div class="author-image" style="flex-shrink: 0;">
+                <img id="quote-author-img" src="/static/img/authors/default.webp" alt="Autor" width="80" height="80" style="border-radius: 50%; border: 3px solid #fff;">
             </div>
-            <div class="quote-slide">
-                <p class="quote-text">Los libros son espejos: sólo ves en ellos lo que ya tienes dentro.</p>                <div class="author-container">
-                    <div class="author-image">
-                        <img src="/static/img/authors/carlos-zafon.webp" alt="Carlos Ruiz Zafón" width="60" height="60">
-                    </div>
-                    <p class="quote-author">- Carlos Ruiz Zafón<br><small>Autor de "La sombra del viento"</small></p>
-                </div>
-            </div>
-            <div class="quote-slide">
-                <p class="quote-text">Hay quien es capaz de irse a la cama cada noche sin leer unas páginas, incomprensible.</p>
-                <div class="author-container">
-                    <div class="author-image">
-                        <img src="/static/img/authors/charles-chaplin.webp" alt="Charles Chaplin">
-                    </div>
-                    <p class="quote-author">- Charles Chaplin<br><small>Actor y cineasta</small></p>
-                </div>
+            <div style="flex: 1 1 300px;">
+                <p class="quote-text" id="quote-text" style="font-size: 1.3rem; margin-bottom: 0.5rem; word-break: break-word;"></p>
+                <p class="quote-author" id="quote-author" style="font-weight: bold; font-size: 1.1rem; margin: 0;"></p>
             </div>
         </div>
     </div>
@@ -83,4 +65,5 @@
         </div>
     </div>
 </section>
+    <script src="/static/js/quotes.js"></script>
 {% endblock %}

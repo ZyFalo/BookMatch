@@ -37,7 +37,7 @@ body {
 /* Header Styles */
 header {
   background-color: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -152,11 +152,13 @@ header .container {
   background-color: white;
   width: 180px;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  display: none;  z-index: 101;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 101;
   padding: 10px 0;
   margin-top: 10px;
-  top: 100%; /* Asegura que esté debajo del nombre de usuario */
+  top: 100%;
+  /* Asegura que esté debajo del nombre de usuario */
 }
 
 .dropdown-content.show {
@@ -186,7 +188,8 @@ header .container {
 }
 
 .hero-content {
-  flex: 3; /* Dar más espacio al contenido */
+  flex: 3;
+  /* Dar más espacio al contenido */
   padding-right: 40px;
 }
 
@@ -211,11 +214,12 @@ header .container {
   position: relative;
   height: 400px;
   width: 100%;
-  max-width: 280px; /* Más estrecho para parecerse a un libro */
+  max-width: 280px;
+  /* Más estrecho para parecerse a un libro */
   margin: 0 auto;
   overflow: hidden;
   border-radius: 8px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   background-color: #f8f8f8;
 }
 
@@ -225,7 +229,8 @@ header .container {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Cambiado a contain para evitar recortes */
+  object-fit: contain;
+  /* Cambiado a contain para evitar recortes */
   opacity: 0;
   transition: opacity 1s ease-in-out;
   border-radius: 8px;
@@ -245,7 +250,7 @@ header .container {
   left: 0;
   width: 100%;
   height: 100%;
-  box-shadow: inset 5px 0 15px rgba(0,0,0,0.1);
+  box-shadow: inset 5px 0 15px rgba(0, 0, 0, 0.1);
   pointer-events: none;
   z-index: 1;
   border-radius: 8px;
@@ -275,9 +280,17 @@ header .container {
 
 /* Indicador de carga */
 @keyframes fadeInOut {
-  0% { opacity: 0.6; }
-  50% { opacity: 0.9; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .hero-image::after {
@@ -306,7 +319,7 @@ header .container {
   margin: 0 auto;
   overflow: hidden;
   border-radius: 50%;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   background-color: #f8f8f8;
 }
 
@@ -334,7 +347,7 @@ header .container {
   left: 0;
   width: 100%;
   height: 100%;
-  box-shadow: inset 5px 5px 15px rgba(0,0,0,0.2);
+  box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   z-index: 2;
   border-radius: 50%;
@@ -415,13 +428,13 @@ header .container {
   background-color: white;
   border-radius: 10px;
   padding: 30px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   transition: all 0.3s;
 }
 
 .feature-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos para círculos perfectos en los iconos de características */
@@ -485,13 +498,15 @@ footer {
   color: var(--light-gray);
 }
 
-.footer-links h3, .footer-contact h3 {
+.footer-links h3,
+.footer-contact h3 {
   font-size: 18px;
   margin-bottom: 20px;
   position: relative;
 }
 
-.footer-links h3::after, .footer-contact h3::after {
+.footer-links h3::after,
+.footer-contact h3::after {
   content: '';
   position: absolute;
   bottom: -10px;
@@ -532,7 +547,7 @@ footer {
 .footer-bottom {
   text-align: center;
   padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Login/Register Pages */
@@ -544,22 +559,25 @@ footer {
   padding: 40px 0;
 }
 
-.login-box, .register-box {
+.login-box,
+.register-box {
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   padding: 40px;
   width: 100%;
   max-width: 450px;
 }
 
-.login-box h1, .register-box h1 {
+.login-box h1,
+.register-box h1 {
   text-align: center;
   color: var(--primary-color);
   margin-bottom: 10px;
 }
 
-.login-box h2, .register-box h2 {
+.login-box h2,
+.register-box h2 {
   text-align: center;
   margin-bottom: 30px;
   color: var(--dark-color);
@@ -614,18 +632,21 @@ footer {
   min-height: 20px;
 }
 
-.register-link, .login-link {
+.register-link,
+.login-link {
   text-align: center;
   margin-top: 20px;
 }
 
-.register-link a, .login-link a {
+.register-link a,
+.login-link a {
   color: var(--primary-color);
   text-decoration: none;
   font-weight: 500;
 }
 
-.register-link a:hover, .login-link a:hover {
+.register-link a:hover,
+.login-link a:hover {
   text-decoration: underline;
 }
 
@@ -636,7 +657,6 @@ footer {
   color: white;
   text-align: center;
   position: relative;
-  overflow: hidden;
   border-radius: 20px;
   margin: 30px 0;
   box-shadow: 0 10px 30px rgba(41, 67, 109, 0.2);
@@ -663,22 +683,26 @@ footer {
 
 .quote-slider {
   position: relative;
-  height: 180px;
+  min-height: 220px;
+  /* altura mínima adaptable */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 20px;
 }
 
 .quote-slide {
-  position: absolute;
   opacity: 0;
   visibility: hidden;
   transition: opacity 1s ease, visibility 1s;
   width: 100%;
-  padding: 0 20px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  text-align: left;
+  position: relative;
+  padding: 1.5rem 0;
 }
 
 .quote-slide.active {
@@ -687,39 +711,38 @@ footer {
 }
 
 .quote-text {
-  font-size: 26px;
+  font-size: 1.6rem;
   font-style: italic;
-  line-height: 1.4;
-  margin-bottom: 25px;
+  line-height: 1.6;
+  margin-bottom: 1rem;
   font-family: var(--font-secondary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 700px;
+  /* antes 600 */
+  flex: 1 1 80%;
   position: relative;
-  max-width: 80%;
 }
 
 .quote-text::before,
 .quote-text::after {
   content: '"';
-  font-size: 50px;
-  line-height: 0;
-  position: relative;
-  opacity: 0.5;
-}
-
-.author-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
+  font-size: 1rem;
+  vertical-align: top;
+  opacity: 0.6;
+  margin: 0 0.2rem;
+  display: inline;
 }
 
 .author-image {
-  width: 70px;
-  height: 70px;
+  width: 150px;
+  /* antes 70px */
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  margin-right: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin-right: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .author-image img {
@@ -729,9 +752,12 @@ footer {
 }
 
 .quote-author {
-  font-size: 16px;
+  font-size: 1rem;
+  font-weight: bold;
   opacity: 0.9;
   text-align: left;
+  flex: 1 1 300px;
+  margin: 0;
 }
 
 /* Responsive styles */
@@ -740,34 +766,35 @@ footer {
     flex-direction: column;
     padding: 20px;
   }
-  
+
   .logo {
     margin-bottom: 15px;
   }
-  
+
   .nav-links {
     margin-bottom: 15px;
   }
-  
+
   .hero {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .hero-content {
     padding-right: 0;
     margin-bottom: 40px;
   }
-  
+
   .cta-buttons {
     justify-content: center;
   }
-  
+
   .footer-content {
     text-align: center;
   }
-  
-  .footer-links h3::after, .footer-contact h3::after {
+
+  .footer-links h3::after,
+  .footer-contact h3::after {
     left: 50%;
     transform: translateX(-50%);
   }
@@ -777,64 +804,53 @@ footer {
     width: 300px;
     max-width: 300px;
   }
-  
+
   .quote-text {
     font-size: 22px;
   }
-  
+
   .quote-author {
     font-size: 16px;
   }
-  
+
   .quote-slider {
     height: 200px;
   }
-  
+
   .quote-section {
     padding: 40px 0;
   }
 }
 
 /* Media queries adicionales para la sección de citas */
-@media (max-width: 768px) {
-  .quote-section {
-    padding: 40px 0;
-    border-radius: 15px;
-    margin: 25px 0;
+@media screen and (max-width: 640px) {
+  .quote-slide {
+    flex-direction: column;
+    text-align: center;
   }
-  
-  .quote-text {
-    font-size: 22px;
-    max-width: 90%;
+
+  .quote-text,
+  .quote-author {
+    text-align: center;
+    max-width: 100%;
   }
-  
+
   .author-image {
-    width: 60px;
-    height: 60px;
-    margin-right: 10px;
-  }
-  
-  .quote-slider {
-    height: 230px;
-  }
-  
-  .feature-icon i {
-    width: 70px;
-    height: 70px;
-    font-size: 32px;
+    margin: 0 auto;
   }
 }
+
 
 @media (max-width: 576px) {
   .nav-links {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .nav-links li {
     margin: 5px 10px;
   }
-  
+
   .cta-buttons {
     flex-direction: column;
     gap: 10px;
@@ -845,19 +861,19 @@ footer {
     width: 250px;
     max-width: 250px;
   }
-  
+
   .quote-text {
     font-size: 18px;
   }
-  
+
   .quote-author {
     font-size: 14px;
   }
-  
+
   .quote-slider {
     height: 220px;
   }
-  
+
   .quote-section {
     padding: 40px 0;
   }
@@ -869,22 +885,22 @@ footer {
     font-size: 18px;
     max-width: 100%;
   }
-  
+
   .author-image {
     width: 50px;
     height: 50px;
   }
-  
+
   .quote-slider {
     height: 260px;
   }
-  
+
   .quote-section {
     padding: 30px 0;
     margin: 20px 0;
     border-radius: 12px;
   }
-  
+
   .feature-icon i {
     width: 60px;
     height: 60px;
@@ -892,27 +908,27 @@ footer {
   }
 
   main.container {
-  min-height: 70vh;
-}
+    min-height: 70vh;
+  }
 
-header {
-  min-height: 62px;
-}
+  header {
+    min-height: 62px;
+  }
 
-header .container {
-  min-height: 62px;
-}
+  header .container {
+    min-height: 62px;
+  }
 
-nav.nav-links {
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-}
+  nav.nav-links {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+  }
 
-.auth-section {
-  min-width: 120px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
+  .auth-section {
+    min-width: 120px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 }

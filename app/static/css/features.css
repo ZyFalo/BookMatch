@@ -24,55 +24,6 @@
 .feature-card:hover .feature-icon i {
     color: #ffffff;
 }
-
-/* Estilos para las citas con fondo azul */
-.quote-section {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    padding: 4rem 0;
-    color: white;
-    margin: 2rem 0;
-}
-
-.quote-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.quote-slider {
-    position: relative;
-    height: 220px;
-}
-
-.quote-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.quote-slide.active {
-    opacity: 1;
-}
-
-.quote-text {
-    font-size: 1.8rem;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-    line-height: 1.4;
-}
-
-.author-container {
-    display: flex;
-    align-items: center;
-}
-
 /* Media queries para responsividad */
 @media (max-width: 768px) {
     .feature-icon {
