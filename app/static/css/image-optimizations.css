@@ -29,15 +29,6 @@
   z-index: 1;
 }
 
-/* Logo con dimensiones precisas */
-.logo-img {
-  width: 32px;
-  height: 32px;
-  margin-right: 8px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
 /* Imágenes de autor en sección de citas */
 .author-image {
   width: 60px;
