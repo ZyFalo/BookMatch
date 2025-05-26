@@ -35,11 +35,16 @@
     padding: 0 1.5rem;
 }
 .books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 2.2rem;
+    justify-content: flex-start;
 }
 .book-card-review {
+    flex: 0 1 320px;
+    max-width: 340px;
+    min-width: 280px;
+    margin: 0 auto;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 2px 16px #29436d18;
@@ -96,44 +101,19 @@
 .book-card-review .book-actions {
     margin-top: 1.2em;
     display: flex;
-    gap: 1em;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.book-card-review .dropdown {
-    position: relative;
-}
-.book-card-review .dropdown-menu {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 110%;
-    width: 180px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    overflow: hidden;
-}
-.book-card-review .dropdown.open .dropdown-menu {
-    display: block;
-}
-.book-card-review .dropdown-item {
-    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    width: 100%;
     align-items: center;
-    gap: 0.7em;
-    padding: 0.8em 1.2em;
-    color: #29436d;
-    text-decoration: none;
-    font-size: 0.98em;
-    background: #fff;
-    cursor: pointer;
-    transition: background 0.15s;
 }
-.book-card-review .dropdown-item:hover {
-    background: #e3eaf7;
-    color: #3571c9;
-    font-weight: bold;
+.book-card-review .book-actions-row,
+.book-card-review .book-actions-row2 {
+    display: flex;
+    gap: 1.5em;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.2em;
 }
 .book-card-review .favorite-btn {
     background: none;
@@ -141,15 +121,34 @@
     color: #ff69b4;
     font-size: 1.5em;
     cursor: pointer;
-    margin-right: 0.5em;
+    margin-right: 0.2em;
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
 }
 .book-card-review .favorite-btn.inactive {
     color: #b0b0b0;
 }
-.book-card-review .review-btn {
+.book-card-review .favorite-btn:hover {
+    color: #ff1493;
+}
+.book-card-review .delete-interaction-btn {
+    background: none;
+    border: none;
+    color: #b0b0b0;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+    margin-left: 0.2em;
+}
+.book-card-review .delete-interaction-btn:hover {
+    color: #b22222;
+}
+.review-btn, .review-link-btn {
     background: #4a6fa5;
-    color: #fff;
+    color: #fff !important;
     border: none;
     border-radius: 8px;
     padding: 0.5em 1.3em;
@@ -158,13 +157,34 @@
     cursor: pointer;
     box-shadow: 0 2px 8px #29436d22;
     transition: background 0.2s;
-    display: inline-block;
-    min-width: 180px;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    height: 38px;
+    text-decoration: none !important;
+}
+.review-btn:hover, .review-link-btn:hover {
+    background: #29436d;
+    color: #fff;
     text-decoration: none;
 }
-.book-card-review .review-btn:hover {
-    background: #29436d;
+@media (max-width: 900px) {
+    .books-grid {
+        gap: 1.2rem;
+    }
+    .book-card-review {
+        min-width: 220px;
+        max-width: 98vw;
+    }
+}
+@media (max-width: 600px) {
+    .books-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    .book-card-review {
+        min-width: 90vw;
+        max-width: 98vw;
+    }
 }
 </style>
 
@@ -218,18 +238,25 @@ document.addEventListener('DOMContentLoaded', async function() {
                 ${generoPrincipal ? `<span>${generoPrincipal.textContent}</span>` : ''}
             </div>
             <div class="book-actions">
-                <button class="favorite-btn${inter.is_favorite ? '' : ' inactive'}" title="Favorito">
-                    <i class="ri-heart${inter.is_favorite ? '-fill' : '-line'}"></i>
-                </button>
-                <div class="dropdown" style="position: relative;">
-                    <button class="review-btn">Lista <i class="ri-arrow-down-s-line"></i></button>
-                    <div class="dropdown-menu" style="display: none; position: absolute; left: 0; top: 110%; width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); z-index: 10; overflow: hidden;">
-                        <a href="#" class="dropdown-item" data-status="to-read" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-bookmark-line" style="font-size: 1.1em;"></i> Por leer</a>
-                        <a href="#" class="dropdown-item" data-status="reading" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-book-open-line" style="font-size: 1.1em;"></i> Leyendo</a>
-                        <a href="#" class="dropdown-item" data-status="completed" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-checkbox-circle-line" style="font-size: 1.1em;"></i> Leído</a>
-                    </div>
+                <div class="book-actions-row">
+                    <button class="favorite-btn${inter.is_favorite ? '' : ' inactive'}" title="Favorito">
+                        <i class="ri-heart${inter.is_favorite ? '-fill' : '-line'}"></i>
+                    </button>
+                    <button class="delete-interaction-btn" title="Eliminar">
+                        <i class="ri-close-line"></i>
+                    </button>
                 </div>
-                <a href="/books/${inter.book_id}/rate" class="review-btn" style="display: inline-block; min-width: 180px; text-align: center; text-decoration: none;">Reseñar</a>
+                <div class="book-actions-row2">
+                    <div class="dropdown" style="position: relative;">
+                        <button class="review-btn">Lista <i class="ri-arrow-down-s-line"></i></button>
+                        <div class="dropdown-menu" style="display: none; position: absolute; left: 0; top: 110%; width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); z-index: 10; overflow: hidden;">
+                            <a href="#" class="dropdown-item" data-status="to-read" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-bookmark-line" style="font-size: 1.1em;"></i> Por leer</a>
+                            <a href="#" class="dropdown-item" data-status="reading" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-book-open-line" style="font-size: 1.1em;"></i> Leyendo</a>
+                            <a href="#" class="dropdown-item" data-status="completed" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-checkbox-circle-line" style="font-size: 1.1em;"></i> Leído</a>
+                        </div>
+                    </div>
+                    <a href="/books/${inter.book_id}/rate" class="review-btn review-link-btn">Reseñar</a>
+                </div>
             </div>
         `;
         grid.appendChild(card);
@@ -289,6 +316,51 @@ document.addEventListener('DOMContentLoaded', async function() {
                         }
                     });
                 });
+            });
+            // Favorito (corazón)
+            const favBtn = card.querySelector('.favorite-btn');
+            favBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                fetch(`/interactions/${inter.book_id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_favorite: !inter.is_favorite })
+                })
+                .then(async r => {
+                    if (!r.ok) {
+                        alert('Error al actualizar favorito');
+                        return null;
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (data) {
+                        inter.is_favorite = data.is_favorite;
+                        favBtn.classList.toggle('inactive', !data.is_favorite);
+                        favBtn.querySelector('i').className = 'ri-heart' + (data.is_favorite ? '-fill' : '-line');
+                    }
+                });
+            });
+            // Eliminar interacción (botón x)
+            const delBtn = card.querySelector('.delete-interaction-btn');
+            delBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('¿Quieres eliminarlo? Perderás la calificación y reseñas realizadas')) {
+                    fetch(`/interactions/${inter.book_id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    })
+                    .then(async r => {
+                        if (!r.ok) {
+                            alert('Error al eliminar la relación');
+                            return;
+                        }
+                        card.remove();
+                    });
+                }
             });
         }, 0);
     }
