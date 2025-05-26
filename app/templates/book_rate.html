@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="rate-container" style="display: flex; gap: 3.5rem; align-items: flex-start; max-width: 950px; margin: 3.5rem auto;">
+    <div class="book-info-rate" style="min-width: 320px; display: flex; flex-direction: column; align-items: center;">
+        <div id="book-cover" style="width: 270px; height: 405px; border-radius: 18px; overflow: hidden; background: #e9ecef; box-shadow: 0 2px 18px #29436d22; margin-bottom: 1.7em;"></div>
+        <div id="book-title" style="font-size: 1.25em; color: #29436d; font-weight: 700; text-align: center; margin-bottom: 0.3em;"></div>
+        <div id="book-author" style="color: #4a6fa5; font-size: 1.08em; margin-bottom: 0.7em; text-align: center;"></div>
+    </div>
+    <div class="rate-form-container" style="flex: 1 1 0; max-width: 420px;">
+        <h2 style="color:#29436d; margin-bottom:1.2rem; font-size:1.35em;">Califica y reseña este libro</h2>
+        <div style="margin-bottom: 1.2em;">
+            <div style="font-size: 1.08em; color: #29436d; font-weight: 600; margin-bottom: 0.3em;">Calificación</div>
+            <div class="stars" id="star-rating" style="font-size: 2.6em; color: #e0e0e0; margin-bottom: 0.2em; cursor: pointer;"></div>
+        </div>
+        <div style="font-size: 1.08em; color: #29436d; font-weight: 600; margin-bottom: 0.3em;">Opinión</div>
+        <textarea id="review-text" placeholder="Escribe tu reseña..." style="width:100%;height:120px;margin-bottom:1.2em;resize:vertical; border-radius:10px; border:1px solid #e0e0e0; padding:0.9em; font-size:1.08em;"></textarea>
+        <button id="save-rate-btn" class="btn minimal-btn">Guardar reseña</button>
+        <div id="rate-message" style="margin-top:1em;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Obtener book_id de la URL: /books/{book_id}/rate
+    const pathParts = window.location.pathname.split('/');
+    const bookId = pathParts.includes('rate') ? pathParts[pathParts.indexOf('rate')-1] : null;
+    if (!bookId) return;
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    // Cargar info del libro
+    const resp = await fetch(`/books/${bookId}`);
+    if (resp.ok) {
+        const html = await resp.text();
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const img = temp.querySelector('.book-cover img, .book-cover-large img');
+        const title = temp.querySelector('h1, h3');
+        const author = temp.querySelector('h3, .book-author');
+        if (img) {
+            document.getElementById('book-cover').innerHTML = `<img src="${img.src}" alt="Portada" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+        if (title) document.getElementById('book-title').textContent = title.textContent;
+        if (author) document.getElementById('book-author').textContent = author.textContent;
+    }
+    // Cargar interacción previa
+    let interaction = null;
+    const intResp = await fetch(`/interactions/${bookId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+    if (intResp.ok) {
+        interaction = await intResp.json();
+        if (interaction) {
+            if (interaction.rating) renderStars(interaction.rating);
+            if (interaction.review) document.getElementById('review-text').value = interaction.review;
+        }
+    }
+    // Renderizar estrellas
+    function renderStars(selected) {
+        const starDiv = document.getElementById('star-rating');
+        starDiv.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('i');
+            star.className = 'ri-star' + (selected >= i ? '-fill' : '-line');
+            star.style.color = selected >= i ? '#FFD700' : '#e0e0e0';
+            star.dataset.value = i;
+            star.addEventListener('mouseenter', () => renderStars(i));
+            star.addEventListener('mouseleave', () => renderStars(selected));
+            star.addEventListener('click', () => {
+                renderStars(i);
+                starDiv.dataset.selected = i;
+            });
+            starDiv.appendChild(star);
+        }
+        starDiv.dataset.selected = selected || '';
+    }
+    renderStars(interaction && interaction.rating ? interaction.rating : 0);
+    // Guardar reseña
+    document.getElementById('save-rate-btn').addEventListener('click', async function() {
+        const rating = parseInt(document.getElementById('star-rating').dataset.selected) || null;
+        const review = document.getElementById('review-text').value.trim();
+        const method = interaction ? 'PATCH' : 'POST';
+        const url = interaction ? `/interactions/${bookId}` : '/interactions/';
+        const body = interaction ? { rating, review } : { book_id: bookId, rating, review };
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        const msgDiv = document.getElementById('rate-message');
+        if (res.ok) {
+            msgDiv.textContent = '¡Reseña guardada!';
+            msgDiv.style.color = '#3571c9';
+        } else {
+            msgDiv.textContent = 'Error al guardar la reseña';
+            msgDiv.style.color = 'crimson';
+        }
+    });
+});
+</script>
+<style>
+.minimal-btn {
+    background: #29436d;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7em 1.7em;
+    font-size: 1.08em;
+    font-weight: 500;
+    box-shadow: none;
+    transition: none;
+    outline: none;
+    cursor: pointer;
+    margin-top: 0.2em;
+}
+.minimal-btn:hover, .minimal-btn:focus {
+    background: #29436d;
+    color: #fff;
+}
+</style>
+{% endblock %}

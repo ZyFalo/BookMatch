@@ -51,6 +51,15 @@ async def read_login(request: Request):
 async def profile_page(request: Request):
     return templates.TemplateResponse("profile.html", {"request": request})
 
+@app.get("/profile/lista/{lista}", response_class=HTMLResponse)
+async def profile_list_page(request: Request, lista: str):
+    # Puedes pasar el nombre de la lista a la plantilla para personalizar el título
+    return templates.TemplateResponse("book_review.html", {"request": request, "lista": lista})
+
+@app.get("/books/{book_id}/rate", response_class=HTMLResponse)
+async def rate_book_page(request: Request, book_id: str):
+    return templates.TemplateResponse("book_rate.html", {"request": request, "book_id": book_id})
+
 # Ruta para pruebas de validación de esquemas
 @app.post("/api/debug/validate")
 async def debug_validation(request: Request):

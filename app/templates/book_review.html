@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-books-review-container">
+    <h1 id="review-list-title" style="color:#29436d; margin-bottom:1.5rem;"></h1>
+    <div class="books-grid" id="books-review-grid">
+        <!-- Las tarjetas de libros se insertan aquí por JS -->
+    </div>
+</div>
+
+<!-- Modal para reseñar -->
+<div id="review-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Reseñar libro</h2>
+        <div id="modal-book-info"></div>
+        <textarea id="review-text" placeholder="Escribe tu reseña..." style="width:100%;height:90px;margin:1em 0;"></textarea>
+        <div style="margin-bottom:1em;">
+            <label for="review-rating">Calificación:</label>
+            <select id="review-rating">
+                <option value="">Sin calificar</option>
+                {% for i in range(1,6) %}
+                <option value="{{i}}">{{i}} ⭐</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button id="save-review-btn" class="btn primary-btn">Guardar reseña</button>
+    </div>
+</div>
+
+<style>
+.profile-books-review-container {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.2rem;
+}
+.book-card-review {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #29436d18;
+    padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-height: 340px;
+    transition: box-shadow 0.2s;
+}
+.book-card-review:hover {
+    box-shadow: 0 6px 24px #29436d33;
+}
+.book-card-review .book-cover {
+    width: 120px;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #e9ecef;
+    margin-bottom: 1.1em;
+    box-shadow: 0 2px 8px #29436d22;
+}
+.book-card-review .book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.book-card-review .book-title {
+    font-size: 1.18em;
+    color: #29436d;
+    font-weight: 600;
+    margin-bottom: 0.3em;
+    text-align: center;
+}
+.book-card-review .book-author {
+    color: #4a6fa5;
+    font-size: 1em;
+    margin-bottom: 0.7em;
+    text-align: center;
+}
+.book-card-review .book-tags {
+    margin-bottom: 0.7em;
+    text-align: center;
+}
+.book-card-review .book-tags span {
+    background: #e9ecef;
+    color: #29436d;
+    border-radius: 4px;
+    padding: 2px 12px;
+    font-size: 0.98em;
+    margin-right: 8px;
+}
+.book-card-review .book-actions {
+    margin-top: 1.2em;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.book-card-review .dropdown {
+    position: relative;
+}
+.book-card-review .dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 110%;
+    width: 180px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    overflow: hidden;
+}
+.book-card-review .dropdown.open .dropdown-menu {
+    display: block;
+}
+.book-card-review .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.8em 1.2em;
+    color: #29436d;
+    text-decoration: none;
+    font-size: 0.98em;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.book-card-review .dropdown-item:hover {
+    background: #e3eaf7;
+    color: #3571c9;
+    font-weight: bold;
+}
+.book-card-review .favorite-btn {
+    background: none;
+    border: none;
+    color: #ff69b4;
+    font-size: 1.5em;
+    cursor: pointer;
+    margin-right: 0.5em;
+    transition: color 0.2s;
+}
+.book-card-review .favorite-btn.inactive {
+    color: #b0b0b0;
+}
+.book-card-review .review-btn {
+    background: #4a6fa5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5em 1.3em;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #29436d22;
+    transition: background 0.2s;
+    display: inline-block;
+    min-width: 180px;
+    text-align: center;
+    text-decoration: none;
+}
+.book-card-review .review-btn:hover {
+    background: #29436d;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const grid = document.getElementById('books-review-grid');
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    // Obtener el tipo de lista desde la URL
+    const pathParts = window.location.pathname.split('/');
+    const lista = decodeURIComponent(pathParts[pathParts.length - 1]);
+    // Mapear nombre de lista a filtro
+    let filtro = () => true;
+    if (lista === 'por leer') filtro = i => i.status === 'to-read';
+    if (lista === 'leyendo actualmente') filtro = i => i.status === 'reading';
+    if (lista === 'leídos recientemente') filtro = i => i.status === 'completed';
+    if (lista === 'favoritos') filtro = i => i.is_favorite === true;
+    // 1. Obtener todas las interacciones del usuario
+    const resp = await fetch('/interactions/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!resp.ok) return;
+    const interacciones = await resp.json();
+    // 2. Filtrar según la lista
+    const librosFiltrados = interacciones.filter(filtro);
+    grid.innerHTML = '';
+    for (const inter of librosFiltrados) {
+        const bookResp = await fetch(`/books/${inter.book_id}`);
+        if (!bookResp.ok) continue;
+        const html = await bookResp.text();
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        // Extraer portada, título, autor, y el primer género
+        const img = temp.querySelector('.book-cover img, .book-cover-large img');
+        const titulo = temp.querySelector('h1, h3');
+        const autor = temp.querySelector('h3, .book-author');
+        const generoPrincipal = temp.querySelector('.book-genres span');
+        // Renderizar tarjeta
+        const card = document.createElement('div');
+        card.className = 'book-card-review';
+        card.innerHTML = `
+            <div class="book-cover">
+                <img src="${img ? img.src : '/static/img/default_cover.webp'}" alt="Portada de ${titulo ? titulo.textContent : ''}">
+            </div>
+            <div class="book-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${titulo ? titulo.textContent : ''}</div>
+            <div class="book-author">${autor ? autor.textContent : ''}</div>
+            <div class="book-tags">
+                ${generoPrincipal ? `<span>${generoPrincipal.textContent}</span>` : ''}
+            </div>
+            <div class="book-actions">
+                <button class="favorite-btn${inter.is_favorite ? '' : ' inactive'}" title="Favorito">
+                    <i class="ri-heart${inter.is_favorite ? '-fill' : '-line'}"></i>
+                </button>
+                <div class="dropdown" style="position: relative;">
+                    <button class="review-btn">Lista <i class="ri-arrow-down-s-line"></i></button>
+                    <div class="dropdown-menu" style="display: none; position: absolute; left: 0; top: 110%; width: 180px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); z-index: 10; overflow: hidden;">
+                        <a href="#" class="dropdown-item" data-status="to-read" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-bookmark-line" style="font-size: 1.1em;"></i> Por leer</a>
+                        <a href="#" class="dropdown-item" data-status="reading" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-book-open-line" style="font-size: 1.1em;"></i> Leyendo</a>
+                        <a href="#" class="dropdown-item" data-status="completed" style="display: flex; align-items: center; gap: 0.7em; padding: 0.8em 1.2em; color: #29436d; text-decoration: none; font-size: 0.95em;"><i class="ri-checkbox-circle-line" style="font-size: 1.1em;"></i> Leído</a>
+                    </div>
+                </div>
+                <a href="/books/${inter.book_id}/rate" class="review-btn" style="display: inline-block; min-width: 180px; text-align: center; text-decoration: none;">Reseñar</a>
+            </div>
+        `;
+        grid.appendChild(card);
+        // Dropdown funcionalidad
+        setTimeout(() => {
+            const dropdown = card.querySelector('.dropdown');
+            const btn = dropdown.querySelector('button.review-btn');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            // Mostrar el estado actual en el botón
+            if (inter.status) {
+                let estadoTxt = '';
+                if (inter.status === 'to-read') estadoTxt = 'Por leer';
+                if (inter.status === 'reading') estadoTxt = 'Leyendo';
+                if (inter.status === 'completed') estadoTxt = 'Leído';
+                btn.innerHTML = estadoTxt + ' <i class="ri-arrow-down-s-line"></i>';
+            }
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) menu.style.display = 'none';
+            });
+            // Métodos de interacción con las listas
+            menu.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const status = item.getAttribute('data-status');
+                    if (!status) return;
+                    const method = inter ? 'PATCH' : 'POST';
+                    const url = inter ? `/interactions/${inter.book_id}` : '/interactions/';
+                    const body = inter ? { status: status } : { book_id: inter.book_id, status: status };
+                    fetch(url, {
+                        method,
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    })
+                    .then(async r => {
+                        if (!r.ok) {
+                            alert('Error al actualizar la lista');
+                            return null;
+                        }
+                        return r.json();
+                    })
+                    .then(data => {
+                        if (data) {
+                            // Actualizar el texto del botón con el nuevo estado
+                            let estadoTxt = '';
+                            if (data.status === 'to-read') estadoTxt = 'Por leer';
+                            if (data.status === 'reading') estadoTxt = 'Leyendo';
+                            if (data.status === 'completed') estadoTxt = 'Leído';
+                            btn.innerHTML = estadoTxt + ' <i class="ri-arrow-down-s-line"></i>';
+                            item.closest('.dropdown-menu').style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }, 0);
+    }
+    // Set dynamic title
+    const titleMap = {
+        'por leer': 'Por leer',
+        'leyendo actualmente': 'Leyendo actualmente',
+        'leídos recientemente': 'Leídos recientemente',
+        'favoritos': 'Favoritos'
+    };
+    document.getElementById('review-list-title').textContent = titleMap[lista] || 'Libros';
+});
+</script>
+{% endblock %}

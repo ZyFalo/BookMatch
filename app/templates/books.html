@@ -58,18 +58,18 @@
         <!-- Tres puntos de opciones en el extremo derecho -->
         <div style="position: absolute; top: 1.5rem; right: 2rem; cursor: pointer;">
             <div class="dropdown-options" style="position: relative;">
-                <span class="options-trigger" style="font-size: 1.6rem; color: #b0b0b0;">&#8942;</span>
+                <span class="options-trigger" tabindex="0" style="font-size: 1.6rem; color: #b0b0b0;">&#8942;</span>
                 <div class="options-menu" style="display: none; position: absolute; right: 0; top: 2.2rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 16px #29436d22; min-width: 180px; z-index: 10; padding: 0.5rem 0;">
-                    <a href="#" class="option-item" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
-                        <i class="ri-heart-line" style="font-size: 1.2em;"></i> Agregar a favoritos
+                    <a href="#" class="option-item favorite-option" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
+                        <i class="ri-heart-line" style="font-size: 1.2em;"></i> <span>Agregar a favoritos</span>
                     </a>
-                    <a href="#" class="option-item" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
+                    <a href="#" class="option-item state-option" data-state="to-read" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
                         <i class="ri-bookmark-line" style="font-size: 1.2em;"></i> Por leer
                     </a>
-                    <a href="#" class="option-item" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
+                    <a href="#" class="option-item state-option" data-state="reading" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
                         <i class="ri-book-open-line" style="font-size: 1.2em;"></i> Leyendo
                     </a>
-                    <a href="#" class="option-item" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
+                    <a href="#" class="option-item state-option" data-state="completed" style="display: flex; align-items: center; gap: 0.7em; padding: 0.6em 1.2em; color: #29436d; text-decoration: none; font-size: 1em;">
                         <i class="ri-checkbox-circle-line" style="font-size: 1.2em;"></i> Leído
                     </a>
                 </div>
@@ -165,28 +165,176 @@
 }
 </style>
 <script>
-document.querySelectorAll('.options-trigger').forEach(trigger => {
+function isAuthenticated() {
+    return !!localStorage.getItem('token');
+}
+
+function showMessage(msg) {
+    let m = document.createElement('div');
+    m.textContent = msg;
+    m.style.position = 'fixed';
+    m.style.top = '30px';
+    m.style.right = '30px';
+    m.style.background = '#4a6fa5';
+    m.style.color = '#fff';
+    m.style.padding = '0.7em 1.5em';
+    m.style.borderRadius = '10px';
+    m.style.zIndex = 9999;
+    m.style.fontWeight = 'bold';
+    document.body.appendChild(m);
+    setTimeout(() => m.remove(), 1800);
+}
+
+function estadoToText(status) {
+    if (status === 'to-read') return 'por leer';
+    if (status === 'reading') return 'leyendo';
+    if (status === 'completed') return 'leído';
+    return '';
+}
+function textToEstado(text) {
+    text = text.toLowerCase();
+    if (text === 'por leer') return 'to-read';
+    if (text === 'leyendo') return 'reading';
+    if (text === 'leído') return 'completed';
+    return '';
+}
+
+// Manejo de menú de opciones y acciones
+document.querySelectorAll('.dropdown-options').forEach(drop => {
+    const trigger = drop.querySelector('.options-trigger');
+    const menu = drop.querySelector('.options-menu');
     trigger.addEventListener('click', function(e) {
         e.stopPropagation();
-        const menu = this.parentElement.querySelector('.options-menu');
+        // Cierra otros menús
+        document.querySelectorAll('.options-menu').forEach(m => { if (m !== menu) m.style.display = 'none'; });
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     });
+    trigger.addEventListener('blur', function() {
+        setTimeout(() => { menu.style.display = 'none'; }, 120);
+    });
 });
-window.addEventListener('click', function() {
+document.addEventListener('click', function(e) {
     document.querySelectorAll('.options-menu').forEach(menu => menu.style.display = 'none');
 });
 
-// Redirigir a login si no está autenticado al hacer click en opciones
-function isAuthenticated() {
-    // Usar el mismo método que AuthService: el token se llama 'token'
-    return !!localStorage.getItem('token');
-}
-document.querySelectorAll('.options-menu .option-item').forEach(option => {
-    option.addEventListener('click', function(e) {
-        if (!isAuthenticated()) {
-            e.preventDefault();
-            window.location.href = '/login';
+// Manejo de interacción
+const token = localStorage.getItem('token');
+document.querySelectorAll('.book-card').forEach(card => {
+    const bookId = card.querySelector('.book-id').value;
+    const optionsMenu = card.querySelector('.options-menu');
+    const favOption = optionsMenu.querySelector('.favorite-option');
+    const favIcon = favOption.querySelector('i');
+    const favText = favOption.querySelector('span');
+    const estadoOptions = optionsMenu.querySelectorAll('.state-option');
+    let interaction = null;
+
+    function updateMenuUI() {
+        // Favorito
+        if (favText) {
+            if (interaction && interaction.is_favorite) {
+                favIcon.classList.remove('ri-heart-line');
+                favIcon.classList.add('ri-heart-fill');
+                favIcon.style.color = '#ff69b4';
+                favText.textContent = 'Favorito';
+            } else {
+                favIcon.classList.remove('ri-heart-fill');
+                favIcon.classList.add('ri-heart-line');
+                favIcon.style.color = '#b0b0b0';
+                favText.textContent = 'Agregar a favoritos';
+            }
         }
+        // Estado
+        estadoOptions.forEach(item => {
+            item.style.background = '#fff';
+            item.style.color = '#29436d';
+            item.style.fontWeight = 'normal';
+            if (interaction && item.getAttribute('data-state') === interaction.status) {
+                item.style.background = '#e9ecef';
+                item.style.color = '#2563eb';
+                item.style.fontWeight = 'bold';
+            }
+        });
+    }
+
+    function fetchInteractionAndUpdate() {
+        if (!token) return;
+        fetch(`/interactions/${bookId}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            interaction = data;
+            updateMenuUI();
+        });
+    }
+
+    // Al abrir menú, cargar interacción
+    drop = card.querySelector('.dropdown-options');
+    function openMenuAndFetch() {
+        fetchInteractionAndUpdate();
+        // Mostrar menú al hacer hover o click
+        const menu = drop.querySelector('.options-menu');
+        menu.style.display = 'block';
+    }
+    drop.querySelector('.options-trigger').addEventListener('click', function(e) {
+        openMenuAndFetch();
+    });
+    drop.querySelector('.options-trigger').addEventListener('mouseenter', function(e) {
+        openMenuAndFetch();
+    });
+    drop.addEventListener('mouseleave', function() {
+        const menu = drop.querySelector('.options-menu');
+        menu.style.display = 'none';
+    });
+
+    // Acción favorito
+    favOption.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login'; return; }
+        const isFav = !(interaction && interaction.is_favorite);
+        const method = interaction ? 'PATCH' : 'POST';
+        const url = interaction ? `/interactions/${bookId}` : '/interactions/';
+        const body = interaction ? { is_favorite: isFav } : { book_id: bookId, is_favorite: isFav };
+        fetch(url, {
+            method,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then(r => r.json())
+        .then(data => {
+            interaction = data;
+            updateMenuUI();
+            showMessage(isFav ? 'Agregado a favoritos' : 'Quitado de favoritos');
+        });
+    });
+    // Acción estado
+    estadoOptions.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!token) { window.location.href = '/login'; return; }
+            const estado = item.getAttribute('data-state');
+            if (!estado) return;
+            const method = interaction ? 'PATCH' : 'POST';
+            const url = interaction ? `/interactions/${bookId}` : '/interactions/';
+            const body = interaction ? { status: estado } : { book_id: bookId, status: estado };
+            fetch(url, {
+                method,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(r => r.json())
+            .then(data => {
+                interaction = data;
+                updateMenuUI();
+                showMessage('Estado actualizado');
+            });
+        });
     });
 });
 </script>

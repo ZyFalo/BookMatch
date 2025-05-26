@@ -19,7 +19,6 @@
         <div class="profile-tabs">
             <button class="tab-btn active" data-tab="reading">Mi Lectura</button>
             <button class="tab-btn" data-tab="favorites">Favoritos</button>
-            <button class="tab-btn" data-tab="reviews">Reseñas</button>
             <button class="tab-btn" data-tab="settings">Configuración</button>
         </div>
         
@@ -69,14 +68,6 @@
                 <h2>Mis libros favoritos</h2>
                 <div class="empty-state">
                     <p>Aún no has marcado ningún libro como favorito</p>
-                    <a href="/books" class="btn primary-btn">Explorar libros</a>
-                </div>
-            </div>
-            
-            <div id="reviews" class="tab-pane">
-                <h2>Mis reseñas</h2>
-                <div class="empty-state">
-                    <p>Aún no has escrito ninguna reseña</p>
                     <a href="/books" class="btn primary-btn">Explorar libros</a>
                 </div>
             </div>
@@ -245,6 +236,151 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     }
+    
+    // Cargar libros de usuario en cada lista
+    async function cargarLibrosUsuario() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        // 1. Obtener todas las interacciones del usuario
+        const resp = await fetch('/interactions/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!resp.ok) return;
+        const interacciones = await resp.json();
+        // 2. Agrupar por estado y favoritos
+        const porLeer = interacciones.filter(i => i.status === 'to-read');
+        const leyendo = interacciones.filter(i => i.status === 'reading');
+        const leidos = interacciones.filter(i => i.status === 'completed');
+        const favoritos = interacciones.filter(i => i.is_favorite);
+        // 3. Renderizar portadas en cada sección
+        await renderLibrosEnSeccion(porLeer, 'Por leer');
+        await renderLibrosEnSeccion(leyendo, 'Leyendo actualmente');
+        await renderLibrosEnSeccion(leidos, 'Leídos recientemente');
+        await renderLibrosEnSeccion(favoritos, 'Favoritos');
+    }
+
+    function findSectionDivByTitle(title) {
+        const headings = document.querySelectorAll('.book-section h2');
+        for (const h2 of headings) {
+            if (h2.textContent.trim() === title) {
+                return h2.parentElement;
+            }
+        }
+        return null;
+    }
+
+    async function renderLibrosEnSeccion(interacciones, seccion) {
+        let sectionDiv;
+        if (seccion === 'Por leer') sectionDiv = findSectionDivByTitle('Por leer');
+        if (seccion === 'Leyendo actualmente') sectionDiv = findSectionDivByTitle('Leyendo actualmente');
+        if (seccion === 'Leídos recientemente') sectionDiv = findSectionDivByTitle('Leídos recientemente');
+        if (seccion === 'Favoritos') sectionDiv = document.getElementById('favorites');
+        if (!sectionDiv) return;
+        const container = document.createElement('div');
+        container.className = 'profile-books-list';
+        container.style.display = 'flex';
+        container.style.gap = '1.7rem';
+        container.style.flexWrap = 'wrap';
+        container.style.justifyContent = 'center';
+        container.style.background = 'white';
+        container.style.borderRadius = '10px';
+        container.style.padding = '18px 10px 10px 10px';
+        container.style.boxShadow = '0 5px 15px rgba(0,0,0,0.05)';
+        // Limitar a 5 libros
+        const maxLibros = 5;
+        const inters = interacciones.slice(0, maxLibros);
+        // Si no hay libros
+        if (inters.length === 0) {
+            sectionDiv.querySelector('.empty-state').style.display = '';
+            if (container.parentNode) container.parentNode.removeChild(container);
+            // Actualizar contador
+            actualizarContador(seccion, 0);
+            // Botón para ver lista completa
+            renderVerListaBtn(sectionDiv, seccion, 0);
+            return;
+        } else {
+            sectionDiv.querySelector('.empty-state').style.display = 'none';
+        }
+        // 4. Obtener datos de cada libro y renderizar solo portada
+        for (const inter of inters) {
+            const resp = await fetch(`/books/${inter.book_id}`);
+            if (!resp.ok) continue;
+            const html = await resp.text();
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const img = temp.querySelector('.book-cover-large img, .book-cover img');
+            const bookLink = document.createElement('a');
+            bookLink.href = `/books/${inter.book_id}`;
+            bookLink.style.display = 'flex';
+            bookLink.style.flexDirection = 'column';
+            bookLink.style.alignItems = 'center';
+            bookLink.style.textDecoration = 'none';
+            bookLink.style.color = '#29436d';
+            if (img) {
+                const portada = document.createElement('img');
+                portada.src = img.src;
+                portada.alt = '';
+                portada.style.width = '130px';
+                portada.style.height = '195px';
+                portada.style.objectFit = 'cover';
+                portada.style.borderRadius = '10px';
+                portada.style.boxShadow = '0 2px 8px #29436d22';
+                bookLink.appendChild(portada);
+            }
+            container.appendChild(bookLink);
+        }
+        // Insertar en la sección
+        if (sectionDiv.querySelector('.profile-books-list')) {
+            sectionDiv.querySelector('.profile-books-list').remove();
+        }
+        sectionDiv.appendChild(container);
+        // Actualizar contador
+        actualizarContador(seccion, interacciones.length);
+        // Botón para ver lista completa
+        renderVerListaBtn(sectionDiv, seccion, interacciones.length);
+    }
+
+    function renderVerListaBtn(sectionDiv, seccion, cantidad) {
+        let btn = sectionDiv.querySelector('.ver-lista-btn');
+        if (btn) btn.remove();
+        if (cantidad > 0) {
+            btn = document.createElement('a');
+            btn.className = 'ver-lista-btn';
+            btn.textContent = 'Ver lista completa';
+            btn.href = `/profile/lista/${encodeURIComponent(seccion.toLowerCase())}`;
+            btn.style.display = 'inline-block';
+            btn.style.margin = '18px 0 0 0';
+            btn.style.background = '#4a6fa5';
+            btn.style.color = '#fff';
+            btn.style.padding = '0.6em 1.5em';
+            btn.style.borderRadius = '8px';
+            btn.style.fontWeight = '500';
+            btn.style.textDecoration = 'none';
+            btn.style.boxShadow = '0 2px 8px #29436d22';
+            btn.style.transition = 'background 0.2s';
+            btn.onmouseover = () => btn.style.background = '#29436d';
+            btn.onmouseout = () => btn.style.background = '#4a6fa5';
+            sectionDiv.appendChild(btn);
+        }
+    }
+
+    function actualizarContador(seccion, cantidad) {
+        let label = '';
+        if (seccion === 'Por leer') label = 'Por leer';
+        if (seccion === 'Leyendo actualmente') label = 'Leyendo actualmente';
+        if (seccion === 'Leídos recientemente') label = 'Libros leídos';
+        // Buscar el span de ese label
+        const statBoxes = document.querySelectorAll('.stat-box');
+        statBoxes.forEach(box => {
+            const statLabel = box.querySelector('.stat-label');
+            if (statLabel && statLabel.textContent.trim() === label) {
+                box.querySelector('.stat-number').textContent = cantidad;
+            }
+        });
+    }
+
+    // Llamar a la función al cargar
+    cargarLibrosUsuario();
 });
 </script>
 <style>

@@ -94,19 +94,161 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!dropdown.contains(e.target)) menu.style.display = 'none';
         });
     }
-    // Tooltip favorito
+    // Tooltip favorito: verifica existencia de .tooltip
     const favIcon = document.querySelector('.favorite-icon');
     if (favIcon) {
         favIcon.addEventListener('mouseenter', function() {
-            favIcon.querySelector('.tooltip').style.visibility = 'visible';
+            const tooltip = favIcon.querySelector('.tooltip');
+            if (tooltip) tooltip.style.visibility = 'visible';
         });
         favIcon.addEventListener('mouseleave', function() {
-            favIcon.querySelector('.tooltip').style.visibility = 'hidden';
+            const tooltip = favIcon.querySelector('.tooltip');
+            if (tooltip) tooltip.style.visibility = 'hidden';
         });
     }
 
-    // Cargar libros similares dinámicamente
+    // --- Interacción usuario-libro ---
     const bookId = "{{ book.id }}";
+    const token = localStorage.getItem('token');
+    const heartIcon = document.querySelector('.favorite-icon i');
+    const statusItems = document.querySelectorAll('.dropdown-item');
+    let interaction = null;
+
+    function showMessage(msg) {
+        let m = document.createElement('div');
+        m.textContent = msg;
+        m.style.position = 'fixed';
+        m.style.top = '30px';
+        m.style.right = '30px';
+        m.style.background = '#4a6fa5';
+        m.style.color = '#fff';
+        m.style.padding = '0.7em 1.5em';
+        m.style.borderRadius = '10px';
+        m.style.zIndex = 9999;
+        m.style.fontWeight = 'bold';
+        document.body.appendChild(m);
+        setTimeout(() => m.remove(), 1800);
+    }
+
+    function updateUI() {
+        // Favorito
+        if (interaction && interaction.is_favorite) {
+            heartIcon.classList.remove('ri-heart-line');
+            heartIcon.classList.add('ri-heart-fill');
+            heartIcon.style.color = '#ff69b4';
+        } else {
+            heartIcon.classList.remove('ri-heart-fill');
+            heartIcon.classList.add('ri-heart-line');
+            heartIcon.style.color = '#ccc';
+        }
+        // Estado
+        statusItems.forEach(item => {
+            item.style.background = '#fff';
+            item.style.color = '#29436d';
+            item.style.textDecoration = 'none';
+            if (interaction && item.textContent.trim().toLowerCase() === estadoToText(interaction.status)) {
+                item.style.background = '#e9ecef';
+                item.style.color = '#2563eb';
+                item.style.fontWeight = 'bold';
+            } else {
+                item.style.fontWeight = 'normal';
+            }
+        });
+    }
+    function estadoToText(status) {
+        if (status === 'to-read') return 'por leer';
+        if (status === 'reading') return 'leyendo';
+        if (status === 'completed') return 'leído';
+        return '';
+    }
+    function textToEstado(text) {
+        text = text.toLowerCase();
+        if (text === 'por leer') return 'to-read';
+        if (text === 'leyendo') return 'reading';
+        if (text === 'leído') return 'completed';
+        return '';
+    }
+    // Cargar interacción
+    if (token) {
+        fetch(`/interactions/${bookId}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (data) interaction = data;
+            updateUI();
+        })
+        .catch(() => { interaction = null; updateUI(); }); // Maneja 404 correctamente
+    }
+    // Click en favorito
+    if (heartIcon) {
+        heartIcon.addEventListener('click', function() {
+            if (!token) { window.location.href = '/login'; return; }
+            const isFav = !(interaction && interaction.is_favorite);
+            const method = interaction ? 'PATCH' : 'POST';
+            const url = interaction ? `/interactions/${bookId}` : '/interactions/';
+            const body = interaction ? { is_favorite: isFav } : { book_id: bookId, is_favorite: isFav };
+            fetch(url, {
+                method,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(async r => {
+                if (!r.ok) {
+                    const err = await r.json().catch(() => ({}));
+                    showMessage(err.detail || 'Error al actualizar favorito');
+                    return null;
+                }
+                return r.json();
+            })
+            .then(data => {
+                if (data) {
+                    interaction = data;
+                    updateUI();
+                    showMessage(isFav ? 'Agregado a favoritos' : 'Quitado de favoritos');
+                }
+            });
+        });
+    }
+    // Click en estado
+    statusItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            if (!token) { window.location.href = '/login'; return; }
+            const estado = textToEstado(item.textContent.trim());
+            if (!estado) return;
+            const method = interaction ? 'PATCH' : 'POST';
+            const url = interaction ? `/interactions/${bookId}` : '/interactions/';
+            const body = interaction ? { status: estado } : { book_id: bookId, status: estado };
+            fetch(url, {
+                method,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(async r => {
+                if (!r.ok) {
+                    const err = await r.json().catch(() => ({}));
+                    showMessage(err.detail || 'Error al actualizar estado');
+                    return null;
+                }
+                return r.json();
+            })
+            .then(data => {
+                if (data) {
+                    interaction = data;
+                    updateUI();
+                    showMessage('Estado actualizado');
+                }
+            });
+        });
+    });
+
+    // Cargar libros similares dinámicamente
     fetch(`/books/${bookId}/similares`)
         .then(resp => resp.json())
         .then(data => {
@@ -140,11 +282,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .other-book-card a {
     word-break: break-word;
+    text-decoration: none;
 }
 .dropdown-menu .dropdown-item:hover {
-    background: #e9ecef;
-    color: #2563eb;
+    background: #e3eaf7;
+    color: #3571c9;
     cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
 }
 </style>
 {% endblock %}
