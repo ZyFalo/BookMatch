@@ -38,3 +38,6 @@ async def startup_db_client():
         await init_db()
     else:
         print("No se pudo conectar a MongoDB para inicializar índices")
+        
+async def get_db():
+    return db

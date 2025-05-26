@@ -9,6 +9,8 @@ from app.routes.books import router as books_router
 from app.routes.users_books import router as users_books
 from app.db.mongo import check_connection, startup_db_client
 from app.services.auth import get_current_user
+from app.routes import recommender
+from app.routes import matcher
 
 app = FastAPI(title="BookMatch API")
 
@@ -37,7 +39,8 @@ app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(quotes_router, prefix="/quotes", tags=["quotes"])
 app.include_router(books_router)
 app.include_router(users_books)
-
+app.include_router(recommender.router)
+app.include_router(matcher.router)
 # Rutas principales para servir las páginas HTML
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -59,6 +62,14 @@ async def profile_list_page(request: Request, lista: str):
 @app.get("/books/{book_id}/rate", response_class=HTMLResponse)
 async def rate_book_page(request: Request, book_id: str):
     return templates.TemplateResponse("book_rate.html", {"request": request, "book_id": book_id})
+
+@app.get("/recommendations", response_class=HTMLResponse)
+async def recomendaciones_page(request: Request):
+    return templates.TemplateResponse("recomendaciones.html", {"request": request})
+
+@app.get("/match", response_class=HTMLResponse)
+async def match_page(request: Request):
+    return templates.TemplateResponse("match.html", {"request": request})
 
 # Ruta para pruebas de validación de esquemas
 @app.post("/api/debug/validate")

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="recomendaciones-container" style="max-width: 700px; margin: 2.5rem auto; padding: 2rem; background: #fff; border-radius: 1.2rem; box-shadow: 0 2px 12px #0001;">
+    <h1 style="color: #29436d; text-align: center; margin-bottom: 1.5rem;">Recomendaciones personalizadas</h1>
+    <div id="recomendaciones-content" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+        <span id="recomendaciones-loading" style="color: #888;">Cargando recomendaciones...</span>
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+        <button id="recargar-recomendaciones" class="btn primary-btn" style="display: none;">Actualizar recomendaciones</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const recomendacionesContent = document.getElementById('recomendaciones-content');
+    const loading = document.getElementById('recomendaciones-loading');
+    const recargarBtn = document.getElementById('recargar-recomendaciones');
+    let userId = null;
+    let token = localStorage.getItem('token');
+
+    // Obtener userId del token JWT (payload)
+    function parseJwt (token) {
+        try {
+            return JSON.parse(atob(token.split('.')[1]));
+        } catch (e) {
+            return null;
+        }
+    }
+    if (token) {
+        const payload = parseJwt(token);
+        userId = payload && (payload.user_id || payload.sub);
+    }
+
+    function renderLibros(libros) {
+        if (!Array.isArray(libros) || libros.length === 0) {
+            recomendacionesContent.innerHTML = '<span style="color:#c00;">No se pudieron obtener recomendaciones.</span>';
+            return;
+        }
+        recomendacionesContent.innerHTML = `<div style="display: flex; flex-wrap: wrap; gap: 1.5em; justify-content: center;">
+            ${libros.map(libro => `
+                <div style="background:#f7f9fb; border-radius:1em; box-shadow:0 2px 8px #29436d11; padding:1.2em; width:220px; display:flex; flex-direction:column; align-items:center;">
+                    <div style="width:120px;height:180px;overflow:hidden;border-radius:0.7em;margin-bottom:0.7em;">
+                        <img src="${libro.portada || '/static/img/default_cover.webp'}" alt="Portada" style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    <div style="font-weight:700;color:#29436d;text-align:center;">${libro.titulo}</div>
+                    <div style="color:#4a6fa5;font-size:0.98em;text-align:center;margin-bottom:0.5em;">${libro.autor || ''}</div>
+                    <div style="font-size:0.93em;color:#888;text-align:center;">${Array.isArray(libro.generos) ? libro.generos.join(', ') : ''}</div>
+                </div>
+            `).join('')}
+        </div>`;
+    }
+
+    async function cargarRecomendaciones() {
+        if (!userId || !token) {
+            recomendacionesContent.innerHTML = '<span style="color:#c00;">Debes iniciar sesión para ver recomendaciones.</span>';
+            recargarBtn.style.display = "none";
+            return;
+        }
+        loading.style.display = '';
+        recargarBtn.style.display = "none";
+        try {
+            const resp = await fetch(`/recomendar/${userId}`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await resp.json();
+            loading.style.display = 'none';
+            if (data.recomendaciones && Array.isArray(data.recomendaciones)) {
+                renderLibros(data.recomendaciones);
+                recargarBtn.style.display = "";
+            } else if (data.message) {
+                recomendacionesContent.innerHTML = `<span style="color:#c00;">${data.message}</span>`;
+            } else {
+                recomendacionesContent.innerHTML = '<span style="color:#c00;">No se pudieron obtener recomendaciones.</span>';
+            }
+        } catch (err) {
+            loading.style.display = 'none';
+            recomendacionesContent.innerHTML = '<span style="color:#c00;">Error al obtener recomendaciones.</span>';
+        }
+    }
+
+    recargarBtn.addEventListener('click', cargarRecomendaciones);
+
+    cargarRecomendaciones();
+});
+</script>
+{% endblock %}

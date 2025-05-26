@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="match-container" style="max-width: 600px; margin: 2.5rem auto; padding: 2rem; background: #fff; border-radius: 1.2rem; box-shadow: 0 2px 12px #0001;">
+    <h1 style="color: #29436d; text-align: center; margin-bottom: 1.5rem;">Match literario</h1>
+    <form id="match-form" style="display: flex; flex-direction: column; gap: 1.2em; align-items: center;">
+        <div style="width:100%;">
+            <label for="email2" style="color:#29436d;font-weight:600;">Correo del otro usuario:</label>
+            <input type="email" id="email2" name="email2" required placeholder="ejemplo@correo.com" style="width:100%;padding:0.7em 1em;border-radius:8px;border:1px solid #e0e0e0;font-size:1.08em;">
+        </div>
+        <button type="submit" class="btn primary-btn" style="width:100%;max-width:220px;">Ver compatibilidad</button>
+    </form>
+    <div id="match-result" style="margin-top:2em;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const form = document.getElementById('match-form');
+    const resultDiv = document.getElementById('match-result');
+    let userEmail = null;
+
+    // Obtener email del usuario autenticado correctamente
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error();
+        const resp = await fetch('/users/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!resp.ok) throw new Error();
+        const user = await resp.json();
+        userEmail = user.email;
+    } catch (e) {
+        userEmail = null;
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        resultDiv.innerHTML = '<span style="color:#888;">Consultando compatibilidad literaria...</span>';
+        const email2 = document.getElementById('email2').value.trim();
+        if (!userEmail || !email2) {
+            resultDiv.innerHTML = '<span style="color:#c00;">Debes iniciar sesión y escribir ambos correos.</span>';
+            return;
+        }
+        console.log('Enviando al backend:', { email1: userEmail, email2 });
+        try {
+            const resp = await fetch('/match', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email1: userEmail, email2 })
+            });
+            const data = await resp.json();
+            if (data.mensaje) {
+                resultDiv.innerHTML = `<div style="background:#eaf3ff;border-radius:0.7em;padding:1.2em 1.2em 1.2em 1.2em;color:#29436d;font-size:1.13em;text-align:center;white-space:pre-line;">${data.mensaje}</div>`;
+            } else if (data.error) {
+                resultDiv.innerHTML = `<span style="color:#c00;">${data.error}</span>`;
+            } else {
+                resultDiv.innerHTML = '<span style="color:#c00;">No se pudo obtener la compatibilidad.</span>';
+            }
+        } catch (err) {
+            resultDiv.innerHTML = '<span style="color:#c00;">Error al consultar el match.</span>';
+        }
+    });
+});
+</script>
+{% endblock %}
