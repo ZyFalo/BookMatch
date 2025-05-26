@@ -74,7 +74,6 @@ const AuthService = {
                     <span class="username">${this.currentUser.username || this.currentUser.email}</span>
                     <div class="dropdown-content">
                         <a href="/profile">Mi perfil</a>
-                        <a href="/my-books">Mis libros</a>
                         <a href="#" id="logout-btn">Cerrar sesión</a>
                     </div>
                 </div>
